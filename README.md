@@ -31,3 +31,6 @@ El ESP32 se encarga de la comunicación con el servidor MQTT y de la conectivida
 
 El ESP32 también gestiona la conexión WiFi y verifica que la conexión al servidor MQTT sea exitosa antes de empezar la vuelta.
 
+## 3. Comunicación IoT
+
+### Protocolo MQTT
