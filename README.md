@@ -34,3 +34,73 @@ El ESP32 también gestiona la conexión WiFi y verifica que la conexión al serv
 ## 3. Comunicación IoT
 
 ### Protocolo MQTT
+Envio de los mensajes json del esp.
+
+ 
+    switch(action) {
+    
+    case 0: // START_LAP
+      json = "{\"team_name\":\"Maradona\",\"id\":\"4\",\"action\":\"START_LAP\"}";
+      break;
+
+    case 1: {// END_LAP
+      unsigned long time = arg.toInt();
+      json = "{\"team_name\":\"Maradona\",\"id\":\"4\",\"action\":\"END_LAP\",\"time\":" 
+        + String(time) + "}";
+      break;
+    }
+
+    case 2: {// OBSTACLE_DETECTED
+      float dist = arg.toFloat();
+      json = "{\"team_name\":\"Maradona\",\"id\":\"4\",\"action\":\"OBSTACLE_DETECTED\",\"distance\":" 
+        + String(dist, 2) + "}";
+      break;
+    }
+
+    case 3: // LINE_LOST
+      json = "{\"team_name\":\"Maradona\",\"id\":\"4\",\"action\":\"LINE_LOST\"}";
+      break;
+
+    case 4: {// PING
+      unsigned long time = arg.toInt();
+      json = "{\"team_name\":\"Maradona\",\"id\":\"4\",\"action\":\"PING\",\"time\":" 
+        + String(time) + "}";
+      break;
+    }
+
+    case 5: // INIT_LINE_SEARCH
+      json = "{\"team_name\":\"Maradona\",\"id\":\"4\",\"action\":\"INIT_LINE_SEARCH\"}";
+      break;
+
+    case 6: // STOP_LINE_SEARCH
+      json = "{\"team_name\":\"Maradona\",\"id\":\"4\",\"action\":\"STOP_LINE_SEARCH\"}";
+      break;
+
+    case 7: // LINE_FOUND
+      json = "{\"team_name\":\"Maradona\",\"id\":\"4\",\"action\":\"LINE_FOUND\"}";
+      break;
+
+    case 8: {// VISIBLE_LINE
+      float stat = arg.toFloat();
+      json = "{\"team_name\":\"Maradona\",\"id\":\"4\",\"action\":\"VISIBLE_LINE\",\"value\":" 
+        + String(stat, 2) + "}";
+      break;
+    }
+    
+### Detalles de la Conexión:
+- **Servidor MQTT**: `193.147.79.118` (teachinghub.eif.urjc.es)
+- **Puerto**: `21883`
+- **Topic MQTT**: `/SETR/2025/4/`
+
+## 4. Inconvenientes y problemas
+-
+
+## 5. Conclusión y video
+Este proyecto ha cumplido con los objetivos establecidos: el robot sigue la línea de forma autónoma, detecta obstáculos y se comunica mediante MQTT con el servidor.
+
+### Video
+
+## 6. Referencias
+- Manual del Kit.
+- Documentación de MQTT.
+- ChatGPT.
