@@ -21,6 +21,16 @@ El código de Arduino maneja el control de los motores, la detección de la lín
 2. **Detección de Línea**: Se usan tres sensores infrarrojos (izquierda, medio, derecha) que se encuentran en la parte delantera del coche y estan conectados a los pines analógicos A0, A1 y A2. Estos sensores leen valores continuos para detectar la línea, no como un sensor digital.
 3. **Detección de Obstáculos**: Se utiliza un sensor ultrasónico conectado a los pines 12 y 13 del Arduino. El sensor mide la distancia y permite detener el robot cuando detecta un obstáculo dentro de el rango permitido.
 
+### Tareas:
+- *Tarea 1: Detección de linea.*h
+  La tarea más prioritaria con una frecuancia de **20 ms**, actualiza los valores y detecta cuando la linea se ha perdido y encontrado, lo que suma latencia a esta tarea, pero asegura no perder ningún mensaje.
+- *Tarea 2: Parpadeo del LED*
+  Es la tarea menos prioritaria con una frecuencia de **300 ms**, se encarga de que el LED se encienda cuando se pierda la linea.
+- *Tarea 3 : Ultrasonido*
+  Es la segunda tarea menos prioritaria con una frecuencia de **60 ms**, deadline corto para evitar choques de obstaculo.
+- *Tarea 4: Motores*
+  Es la segunda más prioritaria con una frecuencia **30 ms**, controla los motores dependiendo de los valores de los infrarojos de la tarea 1.
+
 ### Código ESP32
 El ESP32 se encarga de la comunicación con el servidor MQTT y de la conectividad WiFi. El código configura la red WiFi y se conecta al servidor MQTT para enviar los mensajes JSON necesarios. El robot envía mensajes en diferentes momentos del ciclo, tales como:
 - **START_LAP**: Inicia la vuelta al circuito.
@@ -28,6 +38,10 @@ El ESP32 se encarga de la comunicación con el servidor MQTT y de la conectivida
 - **OBSTACLE_DETECTED**: Informa cuando se detecta un obstáculo.
 - **PING**: Envia un mensaje cada 4 segundos con el estado del robot.
 - **LINE_LOST**: Notifica si el robot se ha salido de la línea.
+- **INIT_LINE_SEARCH**: Notifica el comienzo de busqueda de linea nada más perderla.
+- **STOP_LINE_SEARCH**: Notifica el fin de busqueda de linea nada más detectarla.
+- **LINE_FOUND**: Notifica que ha encontrado la linea estando previamente perdida.
+- **VISIBLE_LINE**: Muestra el procentaje de linea vista durante el camino.
 
 El ESP32 también gestiona la conexión WiFi y verifica que la conexión al servidor MQTT sea exitosa antes de empezar la vuelta.
 
