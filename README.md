@@ -107,7 +107,7 @@ Envio de los mensajes json del esp.
 - **Topic MQTT**: `/SETR/2025/4/`
 
 ## 4. Inconvenientes y problemas
--
+- No cargamos la bateria en las primeras pruebas.
 
 ## 5. Conclusión y video
 Este proyecto ha cumplido con los objetivos establecidos: el robot sigue la línea de forma autónoma, detecta obstáculos y se comunica mediante MQTT con el servidor.
