@@ -22,7 +22,7 @@ El código de Arduino maneja el control de los motores, la detección de la lín
 3. **Detección de Obstáculos**: Se utiliza un sensor ultrasónico conectado a los pines 12 y 13 del Arduino. El sensor mide la distancia y permite detener el robot cuando detecta un obstáculo dentro de el rango permitido.
 
 ### Tareas:
-- *Tarea 1: Detección de linea.*h
+- *Tarea 1: Detección de linea.*
   La tarea más prioritaria con una frecuancia de **20 ms**, actualiza los valores y detecta cuando la linea se ha perdido y encontrado, lo que suma latencia a esta tarea, pero asegura no perder ningún mensaje.
 - *Tarea 2: Parpadeo del LED*
   Es la tarea menos prioritaria con una frecuencia de **300 ms**, se encarga de que el LED se encienda cuando se pierda la linea.
@@ -43,7 +43,9 @@ El ESP32 se encarga de la comunicación con el servidor MQTT y de la conectivida
 - **LINE_FOUND**: Notifica que ha encontrado la linea estando previamente perdida.
 - **VISIBLE_LINE**: Muestra el procentaje de linea vista durante el camino.
 
-El ESP32 también gestiona la conexión WiFi y verifica que la conexión al servidor MQTT sea exitosa antes de empezar la vuelta.
+Antes de empezar la vuelta, nuestro robot se asegura de haber conectado con el ESP mediante la comunicación serie. Para ello, en el setup del robot comprobamos constantemente si nos ha llegado el mensaje *{OK}*, que es el mensaje que va a mandar el ESP por el puerto serie cuando haya conseguido conectarse a la WiFi. 
+
+Cuando las tareas quieran mandar mensajes al puerto serie, en vez de mandar el json entero en el robot, para disminuir la latencia del envío, hemos decidido mandar los mensajes en formato: *{NUMERO_ACCION:ARGUMENTO}*, siendo el argumento opcional, solo en acciones que se necesite. Así el ESP va a estar constantemente recibiendo estas acciones, y dependiendo del numero, enviará los json correspondientes, como se verá a continuación.
 
 ## 3. Comunicación IoT
 
@@ -106,8 +108,30 @@ Envio de los mensajes json del esp.
 - **Puerto**: `21883`
 - **Topic MQTT**: `/SETR/2025/4/`
 
-## 4. Inconvenientes y problemas
-- No cargamos la bateria en las primeras pruebas.
+## 4. Inconvenientes, problemas y soluciones
+Un problema fue la batería, no la cargamos hasta el último día, lo que nos limitó bastante en clase. 
+
+Quitando los errores personales, también tuvimos dificultades haciendo el PD encargado de asignar velocidades (todo lo demás fue bastante trivial mirando los códigos de ayuda proporcionados). Tras muchos intentos fallidos, haciendo el PD, decidimos volver al principio: un control puramente reactivo ejecutado como tarea. 
+Esto nos restó bastante suavidad en el movimiento, pero también hace que la tarea encargada de mover los motores sea mucho más simple, y esto es importante no solo para simplificar la comprensión, sino para disminuir el tiempo de ejecución (ya que trabajamos en RT).
+
+Como auto mejora, las velocidades deberían ser unas constantes para mayor comprensión, pero nosotros las harcodeamos en la tarea.
+
+Otro problema, fue la detección de la línea. Con un código de prueba, veíamos los valores del infrarrojos con y sin linea debajo. Aproximadamente, cuando veíamos una linea, el infrarrojos marcaba 950, y cuando no había, unos 750.
+Con la cinta de prueba, un umbral de detección de 850 no nos dio problemas, pero en el día del examen, probamos el código, y al estar muy pisada la linea, había puntos donde no la detectaba.
+
+Para solucionar esto, bajamos en la segunda prueba el umbral a 800 y ya no nos dio problemas.
+
+También tuvimos problemas en la exactitud del ping. Primeramente hicimos una tarea que se ejecutaba cada 4 segundos y mandaba  el ping, pero la latencia del FREERTOS hacía que se mandase cada 4 segundos y 100 ms, aproximadamente.
+Para tener la exactitud deseada (4 segundos exactos), decidimos meter la funcionalidad del ping en el loop del robot:
+
+``
+  if (millis() - lastPing >= PING) {
+    lastPing = millis();
+    sendMsg(4, String(lastPing - startTime));
+  }
+``
+
+Por último, vamos a hablar de que hemos elegido FREERTOS desde el principio, ya que estaba muy bien explicado en el código de ejemplo visto en clase. Como unica objeción, tuvimos que tener mucha precisión en los deadlines, ya que a veces la tarea del LED no se ejecutaba, pero quitando esos pequeños problemas puntuales, ha sido un acierto.
 
 ## 5. Conclusión y video
 Este proyecto ha cumplido con los objetivos establecidos: el robot sigue la línea de forma autónoma, detecta obstáculos y se comunica mediante MQTT con el servidor.
