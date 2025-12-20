@@ -138,6 +138,10 @@ Este proyecto ha cumplido con los objetivos establecidos: el robot sigue la lín
 
 ### Video
 
+
+https://github.com/user-attachments/assets/a25eb548-997f-4052-b2d2-b9d8c94fc5bb
+
+
 ## 6. Referencias
 - Manual del Kit.
 - Documentación de MQTT.
